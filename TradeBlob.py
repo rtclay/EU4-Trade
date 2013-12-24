@@ -158,7 +158,7 @@ class trade_state:
         else:
             if self.is_country_collecting(country, node):
                 return (1.0 + country.trade_efficiency) * 0.5
-        return country.trade_efficiency
+        return 1.0 + country.trade_efficiency
         
     def is_country_collecting(self, country, node):
         if country.get_capital() == node:
@@ -186,8 +186,7 @@ class trade_state:
         return len([ merch.is_working_in(node) for merch in country.merchants]) > 0
         
     def get_country_power_in_node(self, country, node):
-        has_merchant_in_node = len([ merch.is_working_in(node) for merch in country.merchants]) > 0
-        return self.get_power_modifier_in_node(country, node) * (node_province_power[node][country] + node_fleet_power[node][country] + int(has_merchant_in_node)*2)
+        return self.get_power_modifier_in_node(country, node) * (self.node_province_power[node][country] + self.node_fleet_power[node][country] + int(self.has_merchant_in_node(country,node))*2)
       
     def get_collecting_power(self, node):
         return sum([self.get_country_power_in_node(ctry,node) for ctry in self.countries if self.is_country_collecting(ctry, node)])
