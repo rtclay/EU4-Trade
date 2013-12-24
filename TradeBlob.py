@@ -123,7 +123,6 @@ class trade_node:
             self.name= ""
         self.in_nodes = in_nodes
         self.out_nodes = out_nodes
-        self.value_local = 0
         self.id_number = id_number
         id_number = id_number + 1
         
