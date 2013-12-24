@@ -146,7 +146,7 @@ class trade_state:
         self.node_province_power = dict()#a dictionary pairing nodes to (dictionaries pairing countries to power)
         self.node_fleet_power = dict()#a dictionary pairing nodes to (dictionaries pairing countries to power) 
         self.node_local_value = dict()
-        self.node_incoming_value = dict()#a dictionary pairing nodes to (dictionaries pairing countries to power) 
+        self.node_incoming_value = dict()#a dictionary pairing nodes to incoming trade values, memoized to avoid lots of recursion 
         self.merchants = []
         for cty in self.countries:
             for merch in cty.merchant_number:
