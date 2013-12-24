@@ -1,9 +1,11 @@
 class world_data:
+    '''Contains countries and nodes'''
     def __init__(self):
         self.countries = []
         self.trade_nodes = ()
 
 class trade_ship:
+    '''A trade ship has trade power.  Currently not used, as abstracted into trade fleets.'''
     id_number = 0
     def __init__(self):
         self.trade_power= 0
@@ -11,10 +13,12 @@ class trade_ship:
         id_number = id_number + 1
 
 class trade_fleet:
+    '''A trade fleet is a collection of trading ships.  At this point the simulation doesn't take individual ships into account, just the aggregate ship power.'''
     def __init__(self):
         #self.trade_ships = []
         self.raw_power=0
         self.leader = None
+        self.node = None
         
     def get_leader_maneuver(self):
         return self.leader.maneuver
@@ -26,10 +30,12 @@ class trade_fleet:
         self.raw_power= power
         
 class leader:
+    '''A leader corresponds to an in-game admiral or explorer.  The leader's maneuver value increases the trade fleet's power.'''
     def __init__(self):
         self.maneuver = 0
         
 class merchant:
+    '''A merchant corresponds to an in-game merchant.  They can collect from a node or steer value.'''
     id_number = 0
     def __init__(self, country):
         self.mission = None
@@ -69,6 +75,7 @@ class merchant:
         return "Merchant "+str(self.id_number)
 
 class country:
+    '''A country contains the long-term trade information of a country.  Notably, it does not include information about the allocation of merchants or trade ships. '''
     id_number = 0
     
     def __init__(self, name=None, capital_node, merchant_number):
@@ -82,10 +89,8 @@ class country:
         self.trade_income_modifier = 1.0
         self.trade_efficiency = 0.0
         self.mercantilism = 0.0
-        self.trade_range = None
-        self.embargo_targets = []
-        self.trade_ships = []
-        self.current_scheme = None
+        self.trade_range = None #currently no implementation of trade range.  would need provinces? or maybe dict of node-node distances
+        self.embargo_targets = [] # currently no implementation of embargoes
         self.merchant_number = merchant_number
         
     def get_capital(self):
@@ -108,6 +113,7 @@ class country:
   
 
 class trade_node:
+    '''A trade node represents an in-game trade collection area.  It contains long-term information about the node.  Notably, it contains no information about the merchants, province power, and fleet power operating in the node.'''
     id_number = 0
     
     def __init__(self, name=None, in_nodes=(),out_nodes=()):
@@ -117,7 +123,6 @@ class trade_node:
             self.name= ""
         self.in_nodes = in_nodes
         self.out_nodes = out_nodes
-        self.active_countries = []
         self.value_local = 0
         self.id_number = id_number
         id_number = id_number + 1
@@ -140,6 +145,7 @@ class trade_node:
     
       
 class trade_state:
+    '''A trade state represents a model of instantaneous trading information.  It contains information on merchants and trade power. '''
     def __init__(self, data):
         self.nodes = data.trade_nodes
         self.countries = data.countries
@@ -219,6 +225,7 @@ class trade_state:
         return self.node_local_value.get(node, 0)
                                          
     def get_incoming_value(self, node):
+        #TODO when a node value changes elsewhere, must make sure downstream nodes get new value propagated
         if node in self.node_incoming_value:
             return self.node_incoming_value.get(node)
         else:
@@ -236,7 +243,7 @@ class trade_state:
         #NOTE does not calculate the increase to the bonus deriving from trade steering
         bonuses = [0.0, .05, .075, .091, .103, .113]
         try:
-            return bonus[len([1 for merch in self.merchants if merch.is_working_in(node)])]
+            return bonuses[len([1 for merch in self.merchants if merch.is_working_in(node)])]
         catch:
             return .113
           
